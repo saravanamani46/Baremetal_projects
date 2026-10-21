@@ -1,0 +1,2 @@
+Blinky.c:4:6:LED_Init	4	static
+Blinky.c:19:6:LED_toggle	16	static

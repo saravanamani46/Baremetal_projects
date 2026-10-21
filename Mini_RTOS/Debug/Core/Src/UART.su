@@ -1,0 +1,2 @@
+UART.c:5:6:UART2_Init	24	static
+UART.c:49:6:UART2_SendString	24	static,ignoring_inline_asm

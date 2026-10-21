@@ -1,0 +1,4 @@
+Task.c:11:6:Task2_Init	4	static
+Task.c:17:6:Task1	16	static,ignoring_inline_asm
+Task.c:40:6:Task2	64	static
+Task.c:69:6:Task3	64	static
