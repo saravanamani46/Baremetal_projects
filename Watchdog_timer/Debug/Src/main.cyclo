@@ -1,0 +1,4 @@
+../Src/main.c:5:6:delay	2
+../Src/main.c:12:6:IWDG_Init	3
+../Src/main.c:45:6:IWDG_Refresh	1
+../Src/main.c:51:5:main	1

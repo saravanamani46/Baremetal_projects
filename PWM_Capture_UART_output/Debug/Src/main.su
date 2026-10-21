@@ -1,0 +1,9 @@
+../Src/main.c:5:6:Clock_config	4	static
+../Src/main.c:17:6:Output_PWM_config	4	static
+../Src/main.c:27:6:TIM3_Config	4	static
+../Src/main.c:49:6:Input_PWM_Config	4	static
+../Src/main.c:59:6:TIM2_Config	4	static
+../Src/main.c:78:6:USART2_configure	4	static
+../Src/main.c:94:6:UART2_sendChar	16	static
+../Src/main.c:104:6:UART2_sendString	16	static
+../Src/main.c:113:5:main	200	static
