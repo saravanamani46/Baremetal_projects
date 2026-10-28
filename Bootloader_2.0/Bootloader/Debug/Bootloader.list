@@ -1,0 +1,995 @@
+
+Bootloader.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .isr_vector   00000194  08000000  08000000  00010000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  1 .text         000004c0  08000194  08000194  00010194  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .rodata       000001b0  08000654  08000654  00010654  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  3 .ARM.extab    00000000  08000804  08000804  00020004  2**0
+                  CONTENTS
+  4 .ARM          00000000  08000804  08000804  00020004  2**0
+                  CONTENTS
+  5 .preinit_array 00000000  08000804  08000804  00020004  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  6 .init_array   00000004  08000804  08000804  00010804  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  7 .fini_array   00000004  08000808  08000808  00010808  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  8 .data         00000004  20000000  0800080c  00020000  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  9 .bss          00000020  20000004  08000810  00020004  2**2
+                  ALLOC
+ 10 ._user_heap_stack 00000604  20000024  08000810  00020024  2**0
+                  ALLOC
+ 11 .ARM.attributes 00000030  00000000  00000000  00020004  2**0
+                  CONTENTS, READONLY
+ 12 .debug_info   00001e4f  00000000  00000000  00020034  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 13 .debug_abbrev 00000869  00000000  00000000  00021e83  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 14 .debug_aranges 00000228  00000000  00000000  000226f0  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 15 .debug_ranges 000001c0  00000000  00000000  00022918  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 16 .debug_macro  0001406c  00000000  00000000  00022ad8  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 17 .debug_line   00002bd4  00000000  00000000  00036b44  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 18 .debug_str    0007fbc4  00000000  00000000  00039718  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 19 .comment      00000053  00000000  00000000  000b92dc  2**0
+                  CONTENTS, READONLY
+ 20 .debug_frame  00000648  00000000  00000000  000b9330  2**2
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+
+Disassembly of section .text:
+
+08000194 <__do_global_dtors_aux>:
+ 8000194:	b510      	push	{r4, lr}
+ 8000196:	4c05      	ldr	r4, [pc, #20]	; (80001ac <__do_global_dtors_aux+0x18>)
+ 8000198:	7823      	ldrb	r3, [r4, #0]
+ 800019a:	b933      	cbnz	r3, 80001aa <__do_global_dtors_aux+0x16>
+ 800019c:	4b04      	ldr	r3, [pc, #16]	; (80001b0 <__do_global_dtors_aux+0x1c>)
+ 800019e:	b113      	cbz	r3, 80001a6 <__do_global_dtors_aux+0x12>
+ 80001a0:	4804      	ldr	r0, [pc, #16]	; (80001b4 <__do_global_dtors_aux+0x20>)
+ 80001a2:	f3af 8000 	nop.w
+ 80001a6:	2301      	movs	r3, #1
+ 80001a8:	7023      	strb	r3, [r4, #0]
+ 80001aa:	bd10      	pop	{r4, pc}
+ 80001ac:	20000004 	.word	0x20000004
+ 80001b0:	00000000 	.word	0x00000000
+ 80001b4:	0800063c 	.word	0x0800063c
+
+080001b8 <frame_dummy>:
+ 80001b8:	b508      	push	{r3, lr}
+ 80001ba:	4b03      	ldr	r3, [pc, #12]	; (80001c8 <frame_dummy+0x10>)
+ 80001bc:	b11b      	cbz	r3, 80001c6 <frame_dummy+0xe>
+ 80001be:	4903      	ldr	r1, [pc, #12]	; (80001cc <frame_dummy+0x14>)
+ 80001c0:	4803      	ldr	r0, [pc, #12]	; (80001d0 <frame_dummy+0x18>)
+ 80001c2:	f3af 8000 	nop.w
+ 80001c6:	bd08      	pop	{r3, pc}
+ 80001c8:	00000000 	.word	0x00000000
+ 80001cc:	20000008 	.word	0x20000008
+ 80001d0:	0800063c 	.word	0x0800063c
+
+080001d4 <UART2_Init>:
+#include "stm32f4xx.h"
+#include <stdint.h>
+
+void UART2_Init(void)
+{
+ 80001d4:	b480      	push	{r7}
+ 80001d6:	af00      	add	r7, sp, #0
+    // 1. Enable GPIOA and USART2 clocks
+    RCC->AHB1ENR |= (1U << 0);  // Enable GPIOA clock
+ 80001d8:	4b17      	ldr	r3, [pc, #92]	; (8000238 <UART2_Init+0x64>)
+ 80001da:	6b1b      	ldr	r3, [r3, #48]	; 0x30
+ 80001dc:	4a16      	ldr	r2, [pc, #88]	; (8000238 <UART2_Init+0x64>)
+ 80001de:	f043 0301 	orr.w	r3, r3, #1
+ 80001e2:	6313      	str	r3, [r2, #48]	; 0x30
+    RCC->APB1ENR |= (1U << 17); // Enable USART2 clock
+ 80001e4:	4b14      	ldr	r3, [pc, #80]	; (8000238 <UART2_Init+0x64>)
+ 80001e6:	6c1b      	ldr	r3, [r3, #64]	; 0x40
+ 80001e8:	4a13      	ldr	r2, [pc, #76]	; (8000238 <UART2_Init+0x64>)
+ 80001ea:	f443 3300 	orr.w	r3, r3, #131072	; 0x20000
+ 80001ee:	6413      	str	r3, [r2, #64]	; 0x40
+
+    // 2. Configure PA2 (TX) and PA3 (RX) for Alternate Function mode
+    GPIOA->MODER &= ~((3U << (2 * 2)) | (3U << (3 * 2))); // Clear mode bits
+ 80001f0:	4b12      	ldr	r3, [pc, #72]	; (800023c <UART2_Init+0x68>)
+ 80001f2:	681b      	ldr	r3, [r3, #0]
+ 80001f4:	4a11      	ldr	r2, [pc, #68]	; (800023c <UART2_Init+0x68>)
+ 80001f6:	f023 03f0 	bic.w	r3, r3, #240	; 0xf0
+ 80001fa:	6013      	str	r3, [r2, #0]
+    GPIOA->MODER |=  ((2U << (2 * 2)) | (2U << (3 * 2))); // Set to AF mode
+ 80001fc:	4b0f      	ldr	r3, [pc, #60]	; (800023c <UART2_Init+0x68>)
+ 80001fe:	681b      	ldr	r3, [r3, #0]
+ 8000200:	4a0e      	ldr	r2, [pc, #56]	; (800023c <UART2_Init+0x68>)
+ 8000202:	f043 03a0 	orr.w	r3, r3, #160	; 0xa0
+ 8000206:	6013      	str	r3, [r2, #0]
+
+    // 3. Set Alternate Function type to AF7 (USART2) for PA2 and PA3
+    GPIOA->AFR[0] &= ~((0xFU << (4 * 2)) | (0xFU << (4 * 3)));
+ 8000208:	4b0c      	ldr	r3, [pc, #48]	; (800023c <UART2_Init+0x68>)
+ 800020a:	6a1b      	ldr	r3, [r3, #32]
+ 800020c:	4a0b      	ldr	r2, [pc, #44]	; (800023c <UART2_Init+0x68>)
+ 800020e:	f423 437f 	bic.w	r3, r3, #65280	; 0xff00
+ 8000212:	6213      	str	r3, [r2, #32]
+    GPIOA->AFR[0] |=  ((7U  << (4 * 2)) | (7U  << (4 * 3)));
+ 8000214:	4b09      	ldr	r3, [pc, #36]	; (800023c <UART2_Init+0x68>)
+ 8000216:	6a1b      	ldr	r3, [r3, #32]
+ 8000218:	4a08      	ldr	r2, [pc, #32]	; (800023c <UART2_Init+0x68>)
+ 800021a:	f443 43ee 	orr.w	r3, r3, #30464	; 0x7700
+ 800021e:	6213      	str	r3, [r2, #32]
+
+    // 4. Configure Baud Rate: 115200 bps (assuming 16 MHz internal/external clock)
+    // Formula: USARTDIV = F_CK / (16 * BaudRate) -> 16000000 / (16 * 115200) = 8.68 -> Mantissa = 8, Fraction = 11 (0x8B)
+    USART2->BRR = 0x8B;
+ 8000220:	4b07      	ldr	r3, [pc, #28]	; (8000240 <UART2_Init+0x6c>)
+ 8000222:	228b      	movs	r2, #139	; 0x8b
+ 8000224:	609a      	str	r2, [r3, #8]
+
+    // 5. Enable USART, Transmitter, and Receiver
+    USART2->CR1 = (1U << 13) | (1U << 3) | (1U << 2); // UE = 1, TE = 1, RE = 1
+ 8000226:	4b06      	ldr	r3, [pc, #24]	; (8000240 <UART2_Init+0x6c>)
+ 8000228:	f242 020c 	movw	r2, #8204	; 0x200c
+ 800022c:	60da      	str	r2, [r3, #12]
+}
+ 800022e:	bf00      	nop
+ 8000230:	46bd      	mov	sp, r7
+ 8000232:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000236:	4770      	bx	lr
+ 8000238:	40023800 	.word	0x40023800
+ 800023c:	40020000 	.word	0x40020000
+ 8000240:	40004400 	.word	0x40004400
+
+08000244 <UART2_SendChar>:
+// Send a single character via USART2
+void UART2_SendChar(char c) {
+ 8000244:	b480      	push	{r7}
+ 8000246:	b083      	sub	sp, #12
+ 8000248:	af00      	add	r7, sp, #0
+ 800024a:	4603      	mov	r3, r0
+ 800024c:	71fb      	strb	r3, [r7, #7]
+    // Wait until Transmit Data Register Empty (TXE)
+    while (!(USART2->SR & USART_SR_TXE));
+ 800024e:	bf00      	nop
+ 8000250:	4b07      	ldr	r3, [pc, #28]	; (8000270 <UART2_SendChar+0x2c>)
+ 8000252:	681b      	ldr	r3, [r3, #0]
+ 8000254:	f003 0380 	and.w	r3, r3, #128	; 0x80
+ 8000258:	2b00      	cmp	r3, #0
+ 800025a:	d0f9      	beq.n	8000250 <UART2_SendChar+0xc>
+    USART2->DR = (uint8_t)c;
+ 800025c:	4a04      	ldr	r2, [pc, #16]	; (8000270 <UART2_SendChar+0x2c>)
+ 800025e:	79fb      	ldrb	r3, [r7, #7]
+ 8000260:	6053      	str	r3, [r2, #4]
+}
+ 8000262:	bf00      	nop
+ 8000264:	370c      	adds	r7, #12
+ 8000266:	46bd      	mov	sp, r7
+ 8000268:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 800026c:	4770      	bx	lr
+ 800026e:	bf00      	nop
+ 8000270:	40004400 	.word	0x40004400
+
+08000274 <UART2_Print>:
+
+// Print a full string via USART2
+void UART2_Print(const char *str) {
+ 8000274:	b580      	push	{r7, lr}
+ 8000276:	b082      	sub	sp, #8
+ 8000278:	af00      	add	r7, sp, #0
+ 800027a:	6078      	str	r0, [r7, #4]
+    while (*str) {
+ 800027c:	e006      	b.n	800028c <UART2_Print+0x18>
+        UART2_SendChar(*str++);
+ 800027e:	687b      	ldr	r3, [r7, #4]
+ 8000280:	1c5a      	adds	r2, r3, #1
+ 8000282:	607a      	str	r2, [r7, #4]
+ 8000284:	781b      	ldrb	r3, [r3, #0]
+ 8000286:	4618      	mov	r0, r3
+ 8000288:	f7ff ffdc 	bl	8000244 <UART2_SendChar>
+    while (*str) {
+ 800028c:	687b      	ldr	r3, [r7, #4]
+ 800028e:	781b      	ldrb	r3, [r3, #0]
+ 8000290:	2b00      	cmp	r3, #0
+ 8000292:	d1f4      	bne.n	800027e <UART2_Print+0xa>
+    }
+}
+ 8000294:	bf00      	nop
+ 8000296:	bf00      	nop
+ 8000298:	3708      	adds	r7, #8
+ 800029a:	46bd      	mov	sp, r7
+ 800029c:	bd80      	pop	{r7, pc}
+	...
+
+080002a0 <UART2_ReceiveChar>:
+
+// Receive a character with a timeout loop
+int UART2_ReceiveChar(uint8_t *data, uint32_t timeout_loops) {
+ 80002a0:	b480      	push	{r7}
+ 80002a2:	b085      	sub	sp, #20
+ 80002a4:	af00      	add	r7, sp, #0
+ 80002a6:	6078      	str	r0, [r7, #4]
+ 80002a8:	6039      	str	r1, [r7, #0]
+    volatile uint32_t timeout = timeout_loops;
+ 80002aa:	683b      	ldr	r3, [r7, #0]
+ 80002ac:	60fb      	str	r3, [r7, #12]
+
+    while (timeout > 0) {
+ 80002ae:	e00f      	b.n	80002d0 <UART2_ReceiveChar+0x30>
+        // Check if Read Data Register Not Empty (RXNE)
+        if (USART2->SR & USART_SR_RXNE) {
+ 80002b0:	4b0c      	ldr	r3, [pc, #48]	; (80002e4 <UART2_ReceiveChar+0x44>)
+ 80002b2:	681b      	ldr	r3, [r3, #0]
+ 80002b4:	f003 0320 	and.w	r3, r3, #32
+ 80002b8:	2b00      	cmp	r3, #0
+ 80002ba:	d006      	beq.n	80002ca <UART2_ReceiveChar+0x2a>
+            *data = (uint8_t)(USART2->DR & 0xFF);
+ 80002bc:	4b09      	ldr	r3, [pc, #36]	; (80002e4 <UART2_ReceiveChar+0x44>)
+ 80002be:	685b      	ldr	r3, [r3, #4]
+ 80002c0:	b2da      	uxtb	r2, r3
+ 80002c2:	687b      	ldr	r3, [r7, #4]
+ 80002c4:	701a      	strb	r2, [r3, #0]
+            return 1; // Success
+ 80002c6:	2301      	movs	r3, #1
+ 80002c8:	e006      	b.n	80002d8 <UART2_ReceiveChar+0x38>
+        }
+        timeout--;
+ 80002ca:	68fb      	ldr	r3, [r7, #12]
+ 80002cc:	3b01      	subs	r3, #1
+ 80002ce:	60fb      	str	r3, [r7, #12]
+    while (timeout > 0) {
+ 80002d0:	68fb      	ldr	r3, [r7, #12]
+ 80002d2:	2b00      	cmp	r3, #0
+ 80002d4:	d1ec      	bne.n	80002b0 <UART2_ReceiveChar+0x10>
+    }
+    return 0; // Timeout expired
+ 80002d6:	2300      	movs	r3, #0
+}
+ 80002d8:	4618      	mov	r0, r3
+ 80002da:	3714      	adds	r7, #20
+ 80002dc:	46bd      	mov	sp, r7
+ 80002de:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 80002e2:	4770      	bx	lr
+ 80002e4:	40004400 	.word	0x40004400
+
+080002e8 <UART2_PrintHex>:
+
+// Function pointer type for application entry point
+typedef void (*pFunction)(void);
+
+void UART2_PrintHex(uint32_t num)
+{
+ 80002e8:	b580      	push	{r7, lr}
+ 80002ea:	b088      	sub	sp, #32
+ 80002ec:	af00      	add	r7, sp, #0
+ 80002ee:	6078      	str	r0, [r7, #4]
+    char buf[11];
+    buf[0] = '0';
+ 80002f0:	2330      	movs	r3, #48	; 0x30
+ 80002f2:	733b      	strb	r3, [r7, #12]
+    buf[1] = 'x';
+ 80002f4:	2378      	movs	r3, #120	; 0x78
+ 80002f6:	737b      	strb	r3, [r7, #13]
+
+    for (int i = 7; i >= 0; i--)
+ 80002f8:	2307      	movs	r3, #7
+ 80002fa:	61fb      	str	r3, [r7, #28]
+ 80002fc:	e026      	b.n	800034c <UART2_PrintHex+0x64>
+    {
+        uint32_t nibble = (num >> (i * 4)) & 0x0F;
+ 80002fe:	69fb      	ldr	r3, [r7, #28]
+ 8000300:	009b      	lsls	r3, r3, #2
+ 8000302:	687a      	ldr	r2, [r7, #4]
+ 8000304:	fa22 f303 	lsr.w	r3, r2, r3
+ 8000308:	f003 030f 	and.w	r3, r3, #15
+ 800030c:	61bb      	str	r3, [r7, #24]
+        if (nibble < 10)
+ 800030e:	69bb      	ldr	r3, [r7, #24]
+ 8000310:	2b09      	cmp	r3, #9
+ 8000312:	d80c      	bhi.n	800032e <UART2_PrintHex+0x46>
+            buf[9 - i] = '0' + nibble;
+ 8000314:	69bb      	ldr	r3, [r7, #24]
+ 8000316:	b2da      	uxtb	r2, r3
+ 8000318:	69fb      	ldr	r3, [r7, #28]
+ 800031a:	f1c3 0309 	rsb	r3, r3, #9
+ 800031e:	3230      	adds	r2, #48	; 0x30
+ 8000320:	b2d2      	uxtb	r2, r2
+ 8000322:	f107 0120 	add.w	r1, r7, #32
+ 8000326:	440b      	add	r3, r1
+ 8000328:	f803 2c14 	strb.w	r2, [r3, #-20]
+ 800032c:	e00b      	b.n	8000346 <UART2_PrintHex+0x5e>
+        else
+            buf[9 - i] = 'A' + (nibble - 10);
+ 800032e:	69bb      	ldr	r3, [r7, #24]
+ 8000330:	b2da      	uxtb	r2, r3
+ 8000332:	69fb      	ldr	r3, [r7, #28]
+ 8000334:	f1c3 0309 	rsb	r3, r3, #9
+ 8000338:	3237      	adds	r2, #55	; 0x37
+ 800033a:	b2d2      	uxtb	r2, r2
+ 800033c:	f107 0120 	add.w	r1, r7, #32
+ 8000340:	440b      	add	r3, r1
+ 8000342:	f803 2c14 	strb.w	r2, [r3, #-20]
+    for (int i = 7; i >= 0; i--)
+ 8000346:	69fb      	ldr	r3, [r7, #28]
+ 8000348:	3b01      	subs	r3, #1
+ 800034a:	61fb      	str	r3, [r7, #28]
+ 800034c:	69fb      	ldr	r3, [r7, #28]
+ 800034e:	2b00      	cmp	r3, #0
+ 8000350:	dad5      	bge.n	80002fe <UART2_PrintHex+0x16>
+    }
+    buf[10] = '\0';
+ 8000352:	2300      	movs	r3, #0
+ 8000354:	75bb      	strb	r3, [r7, #22]
+
+    UART2_Print(buf);
+ 8000356:	f107 030c 	add.w	r3, r7, #12
+ 800035a:	4618      	mov	r0, r3
+ 800035c:	f7ff ff8a 	bl	8000274 <UART2_Print>
+}
+ 8000360:	bf00      	nop
+ 8000362:	3720      	adds	r7, #32
+ 8000364:	46bd      	mov	sp, r7
+ 8000366:	bd80      	pop	{r7, pc}
+
+08000368 <Bootloader_Menu>:
+
+void Bootloader_Menu(void)
+{
+ 8000368:	b580      	push	{r7, lr}
+ 800036a:	b084      	sub	sp, #16
+ 800036c:	af00      	add	r7, sp, #0
+    const char *menu_msg = "\r\n"
+ 800036e:	4b24      	ldr	r3, [pc, #144]	; (8000400 <Bootloader_Menu+0x98>)
+ 8000370:	60fb      	str	r3, [r7, #12]
+                           "2 -> Run Factory App\r\n"
+                           "Any Key -> Run Default App\r\n"
+                           "Waiting for selection...\r\n";
+
+    // 1. Print menu over UART
+    UART2_Print(menu_msg);
+ 8000372:	68f8      	ldr	r0, [r7, #12]
+ 8000374:	f7ff ff7e 	bl	8000274 <UART2_Print>
+
+    uint8_t rx_data = 0;
+ 8000378:	2300      	movs	r3, #0
+ 800037a:	70fb      	strb	r3, [r7, #3]
+
+    // 2. Wait for user input with a timeout loop
+    // (Adjust the loop counter constant based on your CPU clock speed for desired seconds)
+    uint32_t timeout_cycles = 15000000UL;
+ 800037c:	4b21      	ldr	r3, [pc, #132]	; (8000404 <Bootloader_Menu+0x9c>)
+ 800037e:	60bb      	str	r3, [r7, #8]
+    int received = UART2_ReceiveChar(&rx_data, timeout_cycles);
+ 8000380:	1cfb      	adds	r3, r7, #3
+ 8000382:	68b9      	ldr	r1, [r7, #8]
+ 8000384:	4618      	mov	r0, r3
+ 8000386:	f7ff ff8b 	bl	80002a0 <UART2_ReceiveChar>
+ 800038a:	6078      	str	r0, [r7, #4]
+
+    if (received)
+ 800038c:	687b      	ldr	r3, [r7, #4]
+ 800038e:	2b00      	cmp	r3, #0
+ 8000390:	d02c      	beq.n	80003ec <Bootloader_Menu+0x84>
+    {
+        if (rx_data == '1')
+ 8000392:	78fb      	ldrb	r3, [r7, #3]
+ 8000394:	2b31      	cmp	r3, #49	; 0x31
+ 8000396:	d10c      	bne.n	80003b2 <Bootloader_Menu+0x4a>
+        {
+            UART2_Print("\r\nExecuting App 1...\r\n");
+ 8000398:	481b      	ldr	r0, [pc, #108]	; (8000408 <Bootloader_Menu+0xa0>)
+ 800039a:	f7ff ff6b 	bl	8000274 <UART2_Print>
+            UART2_PrintHex(APP1_ADDRESS);
+ 800039e:	481b      	ldr	r0, [pc, #108]	; (800040c <Bootloader_Menu+0xa4>)
+ 80003a0:	f7ff ffa2 	bl	80002e8 <UART2_PrintHex>
+            UART2_Print("\r\n");
+ 80003a4:	481a      	ldr	r0, [pc, #104]	; (8000410 <Bootloader_Menu+0xa8>)
+ 80003a6:	f7ff ff65 	bl	8000274 <UART2_Print>
+            Jump_To_Application(APP1_ADDRESS);
+ 80003aa:	4818      	ldr	r0, [pc, #96]	; (800040c <Bootloader_Menu+0xa4>)
+ 80003ac:	f000 f83a 	bl	8000424 <Jump_To_Application>
+    {
+        // 3. Timeout fallback
+        UART2_Print("\r\nTimeout expired. Defaulting to App 1...\r\n");
+        Jump_To_Application(DEFAULT_APP_ADDRESS);
+    }
+}
+ 80003b0:	e022      	b.n	80003f8 <Bootloader_Menu+0x90>
+        else if (rx_data == '2')
+ 80003b2:	78fb      	ldrb	r3, [r7, #3]
+ 80003b4:	2b32      	cmp	r3, #50	; 0x32
+ 80003b6:	d10c      	bne.n	80003d2 <Bootloader_Menu+0x6a>
+            UART2_Print("\r\nExecuting Factory App...\r\n");
+ 80003b8:	4816      	ldr	r0, [pc, #88]	; (8000414 <Bootloader_Menu+0xac>)
+ 80003ba:	f7ff ff5b 	bl	8000274 <UART2_Print>
+            UART2_PrintHex(FACTORY_APP_ADDRESS);
+ 80003be:	4816      	ldr	r0, [pc, #88]	; (8000418 <Bootloader_Menu+0xb0>)
+ 80003c0:	f7ff ff92 	bl	80002e8 <UART2_PrintHex>
+            UART2_Print("\r\n");
+ 80003c4:	4812      	ldr	r0, [pc, #72]	; (8000410 <Bootloader_Menu+0xa8>)
+ 80003c6:	f7ff ff55 	bl	8000274 <UART2_Print>
+            Jump_To_Application(FACTORY_APP_ADDRESS);
+ 80003ca:	4813      	ldr	r0, [pc, #76]	; (8000418 <Bootloader_Menu+0xb0>)
+ 80003cc:	f000 f82a 	bl	8000424 <Jump_To_Application>
+}
+ 80003d0:	e012      	b.n	80003f8 <Bootloader_Menu+0x90>
+            UART2_Print("\r\nKey received. Running Default App...\r\n");
+ 80003d2:	4812      	ldr	r0, [pc, #72]	; (800041c <Bootloader_Menu+0xb4>)
+ 80003d4:	f7ff ff4e 	bl	8000274 <UART2_Print>
+            UART2_PrintHex(DEFAULT_APP_ADDRESS);
+ 80003d8:	480c      	ldr	r0, [pc, #48]	; (800040c <Bootloader_Menu+0xa4>)
+ 80003da:	f7ff ff85 	bl	80002e8 <UART2_PrintHex>
+            UART2_Print("\r\n");
+ 80003de:	480c      	ldr	r0, [pc, #48]	; (8000410 <Bootloader_Menu+0xa8>)
+ 80003e0:	f7ff ff48 	bl	8000274 <UART2_Print>
+            Jump_To_Application(DEFAULT_APP_ADDRESS);
+ 80003e4:	4809      	ldr	r0, [pc, #36]	; (800040c <Bootloader_Menu+0xa4>)
+ 80003e6:	f000 f81d 	bl	8000424 <Jump_To_Application>
+}
+ 80003ea:	e005      	b.n	80003f8 <Bootloader_Menu+0x90>
+        UART2_Print("\r\nTimeout expired. Defaulting to App 1...\r\n");
+ 80003ec:	480c      	ldr	r0, [pc, #48]	; (8000420 <Bootloader_Menu+0xb8>)
+ 80003ee:	f7ff ff41 	bl	8000274 <UART2_Print>
+        Jump_To_Application(DEFAULT_APP_ADDRESS);
+ 80003f2:	4806      	ldr	r0, [pc, #24]	; (800040c <Bootloader_Menu+0xa4>)
+ 80003f4:	f000 f816 	bl	8000424 <Jump_To_Application>
+}
+ 80003f8:	bf00      	nop
+ 80003fa:	3710      	adds	r7, #16
+ 80003fc:	46bd      	mov	sp, r7
+ 80003fe:	bd80      	pop	{r7, pc}
+ 8000400:	08000654 	.word	0x08000654
+ 8000404:	00e4e1c0 	.word	0x00e4e1c0
+ 8000408:	08000718 	.word	0x08000718
+ 800040c:	08008000 	.word	0x08008000
+ 8000410:	08000730 	.word	0x08000730
+ 8000414:	08000734 	.word	0x08000734
+ 8000418:	08044000 	.word	0x08044000
+ 800041c:	08000754 	.word	0x08000754
+ 8000420:	08000780 	.word	0x08000780
+
+08000424 <Jump_To_Application>:
+//}
+
+typedef void (*pFunction)(void);
+
+void Jump_To_Application(uint32_t app_address)
+{
+ 8000424:	b580      	push	{r7, lr}
+ 8000426:	b088      	sub	sp, #32
+ 8000428:	af00      	add	r7, sp, #0
+ 800042a:	6078      	str	r0, [r7, #4]
+    // 1. Fetch the Stack Pointer from the application's vector table
+    uint32_t msp_value = *(volatile uint32_t *)app_address;
+ 800042c:	687b      	ldr	r3, [r7, #4]
+ 800042e:	681b      	ldr	r3, [r3, #0]
+ 8000430:	61bb      	str	r3, [r7, #24]
+    UART2_Print("\r\nFound MSP: ");
+ 8000432:	4828      	ldr	r0, [pc, #160]	; (80004d4 <Jump_To_Application+0xb0>)
+ 8000434:	f7ff ff1e 	bl	8000274 <UART2_Print>
+    UART2_PrintHex(msp_value);
+ 8000438:	69b8      	ldr	r0, [r7, #24]
+ 800043a:	f7ff ff55 	bl	80002e8 <UART2_PrintHex>
+
+    UART2_Print("\r\nReset vector: ");
+ 800043e:	4826      	ldr	r0, [pc, #152]	; (80004d8 <Jump_To_Application+0xb4>)
+ 8000440:	f7ff ff18 	bl	8000274 <UART2_Print>
+    UART2_PrintHex(*(volatile uint32_t *)(app_address + 4));
+ 8000444:	687b      	ldr	r3, [r7, #4]
+ 8000446:	3304      	adds	r3, #4
+ 8000448:	681b      	ldr	r3, [r3, #0]
+ 800044a:	4618      	mov	r0, r3
+ 800044c:	f7ff ff4c 	bl	80002e8 <UART2_PrintHex>
+    #define RAM_START  0x20000000U
+    #define RAM_SIZE   (128 * 1024U)
+    #define RAM_END    (RAM_START + RAM_SIZE)
+
+    // 2. Validate that the stack pointer points inside valid internal RAM
+    if ((msp_value >= RAM_START) && (msp_value < RAM_END))
+ 8000450:	69bb      	ldr	r3, [r7, #24]
+ 8000452:	f1b3 5f00 	cmp.w	r3, #536870912	; 0x20000000
+ 8000456:	d334      	bcc.n	80004c2 <Jump_To_Application+0x9e>
+ 8000458:	69bb      	ldr	r3, [r7, #24]
+ 800045a:	4a20      	ldr	r2, [pc, #128]	; (80004dc <Jump_To_Application+0xb8>)
+ 800045c:	4293      	cmp	r3, r2
+ 800045e:	d830      	bhi.n	80004c2 <Jump_To_Application+0x9e>
+    {
+        // 3. Fetch the Reset Handler address from the application's vector table (offset +4)
+        uint32_t reset_handler_address = *(volatile uint32_t *)(app_address + 4);
+ 8000460:	687b      	ldr	r3, [r7, #4]
+ 8000462:	3304      	adds	r3, #4
+ 8000464:	681b      	ldr	r3, [r3, #0]
+ 8000466:	617b      	str	r3, [r7, #20]
+        pFunction app_reset_handler = (pFunction)reset_handler_address;
+ 8000468:	697b      	ldr	r3, [r7, #20]
+ 800046a:	613b      	str	r3, [r7, #16]
+  \details Disables IRQ interrupts by setting the I-bit in the CPSR.
+           Can only be executed in Privileged modes.
+ */
+__STATIC_FORCEINLINE void __disable_irq(void)
+{
+  __ASM volatile ("cpsid i" : : : "memory");
+ 800046c:	b672      	cpsid	i
+}
+ 800046e:	bf00      	nop
+
+        // 4. Disable all global interrupts before jumping
+        __disable_irq();
+
+        // 4a. Stop SysTick so it can't fire inside the app
+        SysTick->CTRL = 0;
+ 8000470:	4b1b      	ldr	r3, [pc, #108]	; (80004e0 <Jump_To_Application+0xbc>)
+ 8000472:	2200      	movs	r2, #0
+ 8000474:	601a      	str	r2, [r3, #0]
+        SysTick->VAL  = 0;
+ 8000476:	4b1a      	ldr	r3, [pc, #104]	; (80004e0 <Jump_To_Application+0xbc>)
+ 8000478:	2200      	movs	r2, #0
+ 800047a:	609a      	str	r2, [r3, #8]
+
+
+        // 5. Clear all pending interrupts and disable all NVIC channels left by bootloader
+        for (int i = 0; i < 8; i++)
+ 800047c:	2300      	movs	r3, #0
+ 800047e:	61fb      	str	r3, [r7, #28]
+ 8000480:	e010      	b.n	80004a4 <Jump_To_Application+0x80>
+        {
+            NVIC->ICER[i] = 0xFFFFFFFF; // Disable interrupt sources
+ 8000482:	4a18      	ldr	r2, [pc, #96]	; (80004e4 <Jump_To_Application+0xc0>)
+ 8000484:	69fb      	ldr	r3, [r7, #28]
+ 8000486:	3320      	adds	r3, #32
+ 8000488:	f04f 31ff 	mov.w	r1, #4294967295
+ 800048c:	f842 1023 	str.w	r1, [r2, r3, lsl #2]
+            NVIC->ICPR[i] = 0xFFFFFFFF; // Clear pending flags
+ 8000490:	4a14      	ldr	r2, [pc, #80]	; (80004e4 <Jump_To_Application+0xc0>)
+ 8000492:	69fb      	ldr	r3, [r7, #28]
+ 8000494:	3360      	adds	r3, #96	; 0x60
+ 8000496:	f04f 31ff 	mov.w	r1, #4294967295
+ 800049a:	f842 1023 	str.w	r1, [r2, r3, lsl #2]
+        for (int i = 0; i < 8; i++)
+ 800049e:	69fb      	ldr	r3, [r7, #28]
+ 80004a0:	3301      	adds	r3, #1
+ 80004a2:	61fb      	str	r3, [r7, #28]
+ 80004a4:	69fb      	ldr	r3, [r7, #28]
+ 80004a6:	2b07      	cmp	r3, #7
+ 80004a8:	ddeb      	ble.n	8000482 <Jump_To_Application+0x5e>
+        }
+
+        // 6. Set the Vector Table Offset Register (VTOR) to the application address
+        SCB->VTOR = app_address;
+ 80004aa:	4a0f      	ldr	r2, [pc, #60]	; (80004e8 <Jump_To_Application+0xc4>)
+ 80004ac:	687b      	ldr	r3, [r7, #4]
+ 80004ae:	6093      	str	r3, [r2, #8]
+ 80004b0:	69bb      	ldr	r3, [r7, #24]
+ 80004b2:	60fb      	str	r3, [r7, #12]
+  \details Assigns the given value to the Main Stack Pointer (MSP).
+  \param [in]    topOfMainStack  Main Stack Pointer value to set
+ */
+__STATIC_FORCEINLINE void __set_MSP(uint32_t topOfMainStack)
+{
+  __ASM volatile ("MSR msp, %0" : : "r" (topOfMainStack) : );
+ 80004b4:	68fb      	ldr	r3, [r7, #12]
+ 80004b6:	f383 8808 	msr	MSP, r3
+}
+ 80004ba:	bf00      	nop
+
+        // 7. Set the Main Stack Pointer (MSP) to the application's stack value
+        __set_MSP(msp_value);
+
+        // 8. Jump to the application's Reset Handler
+        app_reset_handler();
+ 80004bc:	693b      	ldr	r3, [r7, #16]
+ 80004be:	4798      	blx	r3
+    {
+ 80004c0:	e003      	b.n	80004ca <Jump_To_Application+0xa6>
+    }
+    else
+    {
+        // Handle invalid app image error (e.g., flash is blank or address is wrong)
+        UART2_Print("\r\nError: Invalid Application Image Stack Pointer!\r\n");
+ 80004c2:	480a      	ldr	r0, [pc, #40]	; (80004ec <Jump_To_Application+0xc8>)
+ 80004c4:	f7ff fed6 	bl	8000274 <UART2_Print>
+    }
+}
+ 80004c8:	bf00      	nop
+ 80004ca:	bf00      	nop
+ 80004cc:	3720      	adds	r7, #32
+ 80004ce:	46bd      	mov	sp, r7
+ 80004d0:	bd80      	pop	{r7, pc}
+ 80004d2:	bf00      	nop
+ 80004d4:	080007ac 	.word	0x080007ac
+ 80004d8:	080007bc 	.word	0x080007bc
+ 80004dc:	2001ffff 	.word	0x2001ffff
+ 80004e0:	e000e010 	.word	0xe000e010
+ 80004e4:	e000e100 	.word	0xe000e100
+ 80004e8:	e000ed00 	.word	0xe000ed00
+ 80004ec:	080007d0 	.word	0x080007d0
+
+080004f0 <main>:
+#include "UART.h"
+// Function prototypes for your initialization and menu
+void UART2_Init(void);
+void Bootloader_Menu(void);
+
+int main(void) {
+ 80004f0:	b580      	push	{r7, lr}
+ 80004f2:	af00      	add	r7, sp, #0
+    // 1. Initialize the system clocks and UART peripheral
+    UART2_Init();
+ 80004f4:	f7ff fe6e 	bl	80001d4 <UART2_Init>
+
+    // 2. Launch the interactive bootloader menu
+    Bootloader_Menu();
+ 80004f8:	f7ff ff36 	bl	8000368 <Bootloader_Menu>
+
+    // 3. Fallback loop (should not be reached)
+    while (1)
+ 80004fc:	e7fe      	b.n	80004fc <main+0xc>
+
+080004fe <NMI_Handler>:
+/******************************************************************************/
+/**
+  * @brief This function handles Non maskable interrupt.
+  */
+void NMI_Handler(void)
+{
+ 80004fe:	b480      	push	{r7}
+ 8000500:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
+
+  /* USER CODE END NonMaskableInt_IRQn 0 */
+  /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
+  while (1)
+ 8000502:	e7fe      	b.n	8000502 <NMI_Handler+0x4>
+
+08000504 <HardFault_Handler>:
+
+/**
+  * @brief This function handles Hard fault interrupt.
+  */
+void HardFault_Handler(void)
+{
+ 8000504:	b480      	push	{r7}
+ 8000506:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN HardFault_IRQn 0 */
+
+  /* USER CODE END HardFault_IRQn 0 */
+  while (1)
+ 8000508:	e7fe      	b.n	8000508 <HardFault_Handler+0x4>
+
+0800050a <MemManage_Handler>:
+
+/**
+  * @brief This function handles Memory management fault.
+  */
+void MemManage_Handler(void)
+{
+ 800050a:	b480      	push	{r7}
+ 800050c:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN MemoryManagement_IRQn 0 */
+
+  /* USER CODE END MemoryManagement_IRQn 0 */
+  while (1)
+ 800050e:	e7fe      	b.n	800050e <MemManage_Handler+0x4>
+
+08000510 <BusFault_Handler>:
+
+/**
+  * @brief This function handles Pre-fetch fault, memory access fault.
+  */
+void BusFault_Handler(void)
+{
+ 8000510:	b480      	push	{r7}
+ 8000512:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN BusFault_IRQn 0 */
+
+  /* USER CODE END BusFault_IRQn 0 */
+  while (1)
+ 8000514:	e7fe      	b.n	8000514 <BusFault_Handler+0x4>
+
+08000516 <UsageFault_Handler>:
+
+/**
+  * @brief This function handles Undefined instruction or illegal state.
+  */
+void UsageFault_Handler(void)
+{
+ 8000516:	b480      	push	{r7}
+ 8000518:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN UsageFault_IRQn 0 */
+
+  /* USER CODE END UsageFault_IRQn 0 */
+  while (1)
+ 800051a:	e7fe      	b.n	800051a <UsageFault_Handler+0x4>
+
+0800051c <SVC_Handler>:
+
+/**
+  * @brief This function handles System service call via SWI instruction.
+  */
+void SVC_Handler(void)
+{
+ 800051c:	b480      	push	{r7}
+ 800051e:	af00      	add	r7, sp, #0
+
+  /* USER CODE END SVCall_IRQn 0 */
+  /* USER CODE BEGIN SVCall_IRQn 1 */
+
+  /* USER CODE END SVCall_IRQn 1 */
+}
+ 8000520:	bf00      	nop
+ 8000522:	46bd      	mov	sp, r7
+ 8000524:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000528:	4770      	bx	lr
+
+0800052a <DebugMon_Handler>:
+
+/**
+  * @brief This function handles Debug monitor.
+  */
+void DebugMon_Handler(void)
+{
+ 800052a:	b480      	push	{r7}
+ 800052c:	af00      	add	r7, sp, #0
+
+  /* USER CODE END DebugMonitor_IRQn 0 */
+  /* USER CODE BEGIN DebugMonitor_IRQn 1 */
+
+  /* USER CODE END DebugMonitor_IRQn 1 */
+}
+ 800052e:	bf00      	nop
+ 8000530:	46bd      	mov	sp, r7
+ 8000532:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000536:	4770      	bx	lr
+
+08000538 <PendSV_Handler>:
+
+/**
+  * @brief This function handles Pendable request for system service.
+  */
+void PendSV_Handler(void)
+{
+ 8000538:	b480      	push	{r7}
+ 800053a:	af00      	add	r7, sp, #0
+
+  /* USER CODE END PendSV_IRQn 0 */
+  /* USER CODE BEGIN PendSV_IRQn 1 */
+
+  /* USER CODE END PendSV_IRQn 1 */
+}
+ 800053c:	bf00      	nop
+ 800053e:	46bd      	mov	sp, r7
+ 8000540:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000544:	4770      	bx	lr
+
+08000546 <SysTick_Handler>:
+
+/**
+  * @brief This function handles System tick timer.
+  */
+void SysTick_Handler(void)
+{
+ 8000546:	b580      	push	{r7, lr}
+ 8000548:	af00      	add	r7, sp, #0
+  /* USER CODE BEGIN SysTick_IRQn 0 */
+
+  /* USER CODE END SysTick_IRQn 0 */
+  HAL_IncTick();
+ 800054a:	f000 f83f 	bl	80005cc <HAL_IncTick>
+  /* USER CODE BEGIN SysTick_IRQn 1 */
+
+  /* USER CODE END SysTick_IRQn 1 */
+}
+ 800054e:	bf00      	nop
+ 8000550:	bd80      	pop	{r7, pc}
+	...
+
+08000554 <SystemInit>:
+  *         configuration.
+  * @param  None
+  * @retval None
+  */
+void SystemInit(void)
+{
+ 8000554:	b480      	push	{r7}
+ 8000556:	af00      	add	r7, sp, #0
+  /* FPU settings ------------------------------------------------------------*/
+  #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
+    SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
+ 8000558:	4b06      	ldr	r3, [pc, #24]	; (8000574 <SystemInit+0x20>)
+ 800055a:	f8d3 3088 	ldr.w	r3, [r3, #136]	; 0x88
+ 800055e:	4a05      	ldr	r2, [pc, #20]	; (8000574 <SystemInit+0x20>)
+ 8000560:	f443 0370 	orr.w	r3, r3, #15728640	; 0xf00000
+ 8000564:	f8c2 3088 	str.w	r3, [r2, #136]	; 0x88
+
+  /* Configure the Vector Table location -------------------------------------*/
+#if defined(USER_VECT_TAB_ADDRESS)
+  SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
+#endif /* USER_VECT_TAB_ADDRESS */
+}
+ 8000568:	bf00      	nop
+ 800056a:	46bd      	mov	sp, r7
+ 800056c:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000570:	4770      	bx	lr
+ 8000572:	bf00      	nop
+ 8000574:	e000ed00 	.word	0xe000ed00
+
+08000578 <Reset_Handler>:
+
+    .section  .text.Reset_Handler
+  .weak  Reset_Handler
+  .type  Reset_Handler, %function
+Reset_Handler:  
+  ldr   sp, =_estack    		 /* set stack pointer */
+ 8000578:	f8df d034 	ldr.w	sp, [pc, #52]	; 80005b0 <LoopFillZerobss+0x12>
+
+/* Copy the data segment initializers from flash to SRAM */  
+  ldr r0, =_sdata
+ 800057c:	480d      	ldr	r0, [pc, #52]	; (80005b4 <LoopFillZerobss+0x16>)
+  ldr r1, =_edata
+ 800057e:	490e      	ldr	r1, [pc, #56]	; (80005b8 <LoopFillZerobss+0x1a>)
+  ldr r2, =_sidata
+ 8000580:	4a0e      	ldr	r2, [pc, #56]	; (80005bc <LoopFillZerobss+0x1e>)
+  movs r3, #0
+ 8000582:	2300      	movs	r3, #0
+  b LoopCopyDataInit
+ 8000584:	e002      	b.n	800058c <LoopCopyDataInit>
+
+08000586 <CopyDataInit>:
+
+CopyDataInit:
+  ldr r4, [r2, r3]
+ 8000586:	58d4      	ldr	r4, [r2, r3]
+  str r4, [r0, r3]
+ 8000588:	50c4      	str	r4, [r0, r3]
+  adds r3, r3, #4
+ 800058a:	3304      	adds	r3, #4
+
+0800058c <LoopCopyDataInit>:
+
+LoopCopyDataInit:
+  adds r4, r0, r3
+ 800058c:	18c4      	adds	r4, r0, r3
+  cmp r4, r1
+ 800058e:	428c      	cmp	r4, r1
+  bcc CopyDataInit
+ 8000590:	d3f9      	bcc.n	8000586 <CopyDataInit>
+  
+/* Zero fill the bss segment. */
+  ldr r2, =_sbss
+ 8000592:	4a0b      	ldr	r2, [pc, #44]	; (80005c0 <LoopFillZerobss+0x22>)
+  ldr r4, =_ebss
+ 8000594:	4c0b      	ldr	r4, [pc, #44]	; (80005c4 <LoopFillZerobss+0x26>)
+  movs r3, #0
+ 8000596:	2300      	movs	r3, #0
+  b LoopFillZerobss
+ 8000598:	e001      	b.n	800059e <LoopFillZerobss>
+
+0800059a <FillZerobss>:
+
+FillZerobss:
+  str  r3, [r2]
+ 800059a:	6013      	str	r3, [r2, #0]
+  adds r2, r2, #4
+ 800059c:	3204      	adds	r2, #4
+
+0800059e <LoopFillZerobss>:
+
+LoopFillZerobss:
+  cmp r2, r4
+ 800059e:	42a2      	cmp	r2, r4
+  bcc FillZerobss
+ 80005a0:	d3fb      	bcc.n	800059a <FillZerobss>
+
+/* Call the clock system intitialization function.*/
+  bl  SystemInit   
+ 80005a2:	f7ff ffd7 	bl	8000554 <SystemInit>
+/* Call static constructors */
+    bl __libc_init_array
+ 80005a6:	f000 f825 	bl	80005f4 <__libc_init_array>
+/* Call the application's entry point.*/
+  bl  main
+ 80005aa:	f7ff ffa1 	bl	80004f0 <main>
+  bx  lr    
+ 80005ae:	4770      	bx	lr
+  ldr   sp, =_estack    		 /* set stack pointer */
+ 80005b0:	20018000 	.word	0x20018000
+  ldr r0, =_sdata
+ 80005b4:	20000000 	.word	0x20000000
+  ldr r1, =_edata
+ 80005b8:	20000004 	.word	0x20000004
+  ldr r2, =_sidata
+ 80005bc:	0800080c 	.word	0x0800080c
+  ldr r2, =_sbss
+ 80005c0:	20000004 	.word	0x20000004
+  ldr r4, =_ebss
+ 80005c4:	20000024 	.word	0x20000024
+
+080005c8 <ADC_IRQHandler>:
+ * @retval None       
+*/
+    .section  .text.Default_Handler,"ax",%progbits
+Default_Handler:
+Infinite_Loop:
+  b  Infinite_Loop
+ 80005c8:	e7fe      	b.n	80005c8 <ADC_IRQHandler>
+	...
+
+080005cc <HAL_IncTick>:
+ * @note This function is declared as __weak to be overwritten in case of other 
+  *      implementations in user file.
+  * @retval None
+  */
+__weak void HAL_IncTick(void)
+{
+ 80005cc:	b480      	push	{r7}
+ 80005ce:	af00      	add	r7, sp, #0
+  uwTick += uwTickFreq;
+ 80005d0:	4b06      	ldr	r3, [pc, #24]	; (80005ec <HAL_IncTick+0x20>)
+ 80005d2:	781b      	ldrb	r3, [r3, #0]
+ 80005d4:	461a      	mov	r2, r3
+ 80005d6:	4b06      	ldr	r3, [pc, #24]	; (80005f0 <HAL_IncTick+0x24>)
+ 80005d8:	681b      	ldr	r3, [r3, #0]
+ 80005da:	4413      	add	r3, r2
+ 80005dc:	4a04      	ldr	r2, [pc, #16]	; (80005f0 <HAL_IncTick+0x24>)
+ 80005de:	6013      	str	r3, [r2, #0]
+}
+ 80005e0:	bf00      	nop
+ 80005e2:	46bd      	mov	sp, r7
+ 80005e4:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 80005e8:	4770      	bx	lr
+ 80005ea:	bf00      	nop
+ 80005ec:	20000000 	.word	0x20000000
+ 80005f0:	20000020 	.word	0x20000020
+
+080005f4 <__libc_init_array>:
+ 80005f4:	b570      	push	{r4, r5, r6, lr}
+ 80005f6:	4d0d      	ldr	r5, [pc, #52]	; (800062c <__libc_init_array+0x38>)
+ 80005f8:	4c0d      	ldr	r4, [pc, #52]	; (8000630 <__libc_init_array+0x3c>)
+ 80005fa:	1b64      	subs	r4, r4, r5
+ 80005fc:	10a4      	asrs	r4, r4, #2
+ 80005fe:	2600      	movs	r6, #0
+ 8000600:	42a6      	cmp	r6, r4
+ 8000602:	d109      	bne.n	8000618 <__libc_init_array+0x24>
+ 8000604:	4d0b      	ldr	r5, [pc, #44]	; (8000634 <__libc_init_array+0x40>)
+ 8000606:	4c0c      	ldr	r4, [pc, #48]	; (8000638 <__libc_init_array+0x44>)
+ 8000608:	f000 f818 	bl	800063c <_init>
+ 800060c:	1b64      	subs	r4, r4, r5
+ 800060e:	10a4      	asrs	r4, r4, #2
+ 8000610:	2600      	movs	r6, #0
+ 8000612:	42a6      	cmp	r6, r4
+ 8000614:	d105      	bne.n	8000622 <__libc_init_array+0x2e>
+ 8000616:	bd70      	pop	{r4, r5, r6, pc}
+ 8000618:	f855 3b04 	ldr.w	r3, [r5], #4
+ 800061c:	4798      	blx	r3
+ 800061e:	3601      	adds	r6, #1
+ 8000620:	e7ee      	b.n	8000600 <__libc_init_array+0xc>
+ 8000622:	f855 3b04 	ldr.w	r3, [r5], #4
+ 8000626:	4798      	blx	r3
+ 8000628:	3601      	adds	r6, #1
+ 800062a:	e7f2      	b.n	8000612 <__libc_init_array+0x1e>
+ 800062c:	08000804 	.word	0x08000804
+ 8000630:	08000804 	.word	0x08000804
+ 8000634:	08000804 	.word	0x08000804
+ 8000638:	08000808 	.word	0x08000808
+
+0800063c <_init>:
+ 800063c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 800063e:	bf00      	nop
+ 8000640:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 8000642:	bc08      	pop	{r3}
+ 8000644:	469e      	mov	lr, r3
+ 8000646:	4770      	bx	lr
+
+08000648 <_fini>:
+ 8000648:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 800064a:	bf00      	nop
+ 800064c:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 800064e:	bc08      	pop	{r3}
+ 8000650:	469e      	mov	lr, r3
+ 8000652:	4770      	bx	lr

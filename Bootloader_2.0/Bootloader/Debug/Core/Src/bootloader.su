@@ -1,0 +1,3 @@
+bootloader.c:18:6:UART2_PrintHex	40	static
+bootloader.c:37:6:Bootloader_Menu	24	static
+bootloader.c:125:6:Jump_To_Application	40	static,ignoring_inline_asm

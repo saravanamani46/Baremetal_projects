@@ -1,0 +1,2 @@
+bootloader.c:19:6:Bootloader_Menu	24	static
+bootloader.c:66:6:Jump_To_Application	32	static,ignoring_inline_asm

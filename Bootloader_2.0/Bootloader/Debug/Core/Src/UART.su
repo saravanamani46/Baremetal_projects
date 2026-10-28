@@ -1,0 +1,4 @@
+UART.c:4:6:UART2_Init	4	static
+UART.c:26:6:UART2_SendChar	16	static
+UART.c:33:6:UART2_Print	16	static
+UART.c:40:5:UART2_ReceiveChar	24	static
